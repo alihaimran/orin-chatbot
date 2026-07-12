@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ARX AI Assistant</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- ================= Sidebar ================= -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                AI
+            </div>
+
+            <h2>ARX AI</h2>
+
+        </div>
+
+        <button class="new-chat">
+
+            <i class="fa-solid fa-plus"></i>
+
+            New Chat
+
+        </button>
+
+        <div class="history-title">
+
+            Recent Chats
+
+        </div>
+
+        <div class="chat-history">
+
+            <div class="history-item active">
+
+                <i class="fa-regular fa-message"></i>
+
+                Explain Machine Learning
+
+            </div>
+
+            <div class="history-item">
+
+                <i class="fa-regular fa-message"></i>
+
+                Python Interview
+
+            </div>
+
+            <div class="history-item">
+
+                <i class="fa-regular fa-message"></i>
+
+                AI Roadmap
+
+            </div>
+
+            <div class="history-item">
+
+                <i class="fa-regular fa-message"></i>
+
+                Portfolio Design
+
+            </div>
+
+        </div>
+
+        <div class="sidebar-footer">
+
+            <i class="fa-solid fa-circle-check"></i>
+
+            Connected
+
+        </div>
+
+    </aside>
+
+    <!-- ================= Main ================= -->
+
+    <main class="main">
+
+        <!-- Top -->
+
+        <header class="topbar">
+
+            <div class="title">
+
+                New Conversation
+
+            </div>
+
+            <div class="status">
+
+                Ready
+
+            </div>
+
+        </header>
+
+        <!-- Welcome -->
+
+        <section class="welcome">
+
+            <h1>
+
+                How can I help you today?
+
+            </h1>
+
+            <p>
+
+                Ask anything about AI, Coding, Python, Data Science,
+                Web Development or your Projects.
+
+            </p>
+
+            <div class="cards">
+
+                <div class="card">
+
+                    <i class="fa-solid fa-code"></i>
+
+                    <h3>Write Code</h3>
+
+                    <span>Create HTML, CSS, JS & Python</span>
+
+                </div>
+
+                <div class="card">
+
+                    <i class="fa-solid fa-lightbulb"></i>
+
+                    <h3>Brainstorm</h3>
+
+                    <span>Generate creative ideas</span>
+
+                </div>
+
+                <div class="card">
+
+                    <i class="fa-solid fa-bug"></i>
+
+                    <h3>Debug</h3>
+
+                    <span>Find and fix bugs</span>
+
+                </div>
+
+                <div class="card">
+
+                    <i class="fa-solid fa-graduation-cap"></i>
+
+                    <h3>Learn AI</h3>
+
+                    <span>Understand concepts easily</span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- Chat Area -->
+
+        <section class="chat-area" id="chatArea">
+
+        </section>
+
+        <!-- Input -->
+
+        <div class="chat-input">
+
+            <textarea
+                placeholder="Message ARX AI..."
+                rows="1"></textarea>
+
+            <button>
+
+                <i class="fa-solid fa-paper-plane"></i>
+
+            </button>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
