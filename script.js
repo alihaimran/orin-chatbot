@@ -7,8 +7,8 @@ const sendBtn = document.querySelector(".chat-input button");
 const chatArea = document.getElementById("chatArea");
 const newChatBtn = document.querySelector(".new-chat");
 
-// FastAPI URL
-const API_URL = "http://127.0.0.1:8000/chat";
+// FastAPI URL (live backend)
+const API_URL = "https://orin-chatbot.fastapicloud.dev/chat";
 
 // Auto Height
 textarea.addEventListener("input", () => {
@@ -107,7 +107,7 @@ async function sendMessage(){
 
         typing.remove();
 
-        createMessage(data.response,"bot");
+        createMessage(data.reply,"bot");
 
     }
     catch(error){
