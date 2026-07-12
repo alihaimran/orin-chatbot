@@ -1,3 +1,5 @@
+
+
 /* ==========================
    Google Font
 ========================== */
@@ -10,7 +12,7 @@
 }
 
 body{
-    background:#0f1a17;
+    background:#000000;
     color:#fff;
     height:100vh;
     overflow:hidden;
@@ -29,12 +31,12 @@ body{
 }
 
 ::-webkit-scrollbar-thumb{
-    background:#1f3b34;
+    background:#1f2937;
     border-radius:10px;
 }
 
 ::-webkit-scrollbar-thumb:hover{
-    background:#2d5147;
+    background:#374151;
 }
 
 /* ==========================
@@ -52,8 +54,8 @@ body{
 
 .sidebar{
     width:270px;
-    background:#0a1512;
-    border-right:1px solid #16261f;
+    background:#000000;
+    border-right:1px solid #1a1a1a;
     display:flex;
     flex-direction:column;
     padding:20px;
@@ -121,7 +123,7 @@ body{
 .history-title{
     margin-top:35px;
     margin-bottom:15px;
-    color:#7fa89b;
+    color:#6b7280;
     font-size:14px;
 }
 
@@ -138,16 +140,16 @@ body{
     border-radius:10px;
     cursor:pointer;
     margin-bottom:8px;
-    color:#c8e6de;
+    color:#d1d5db;
     transition:.25s;
 }
 
 .history-item:hover{
-    background:#16261f;
+    background:#111827;
 }
 
 .history-item.active{
-    background:#134e40;
+    background:#0d2b24;
 }
 
 /* ==========================
@@ -155,9 +157,9 @@ body{
 ========================== */
 
 .sidebar-footer{
-    border-top:1px solid #16261f;
+    border-top:1px solid #1a1a1a;
     padding-top:18px;
-    color:#7fa89b;
+    color:#6b7280;
     display:flex;
     align-items:center;
     gap:10px;
@@ -175,7 +177,7 @@ body{
     flex:1;
     display:flex;
     flex-direction:column;
-    background:#0f1a17;
+    background:#000000;
 }
 
 /* ==========================
@@ -184,7 +186,7 @@ body{
 
 .topbar{
     height:70px;
-    border-bottom:1px solid #16261f;
+    border-bottom:1px solid #1a1a1a;
     display:flex;
     justify-content:space-between;
     align-items:center;
@@ -232,14 +234,14 @@ body{
 .welcome h1{
     font-size:42px;
     margin-bottom:15px;
-    background:linear-gradient(135deg,#fff,#7fa89b);
+    background:linear-gradient(135deg,#fff,#6b7280);
     -webkit-background-clip:text;
     background-clip:text;
     -webkit-text-fill-color:transparent;
 }
 
 .welcome p{
-    color:#7fa89b;
+    color:#6b7280;
     line-height:1.7;
 }
 
@@ -255,8 +257,8 @@ body{
 }
 
 .card{
-    background:#132420;
-    border:1px solid #1f3b34;
+    background:#0a0a0a;
+    border:1px solid #1f2937;
     border-radius:16px;
     padding:25px;
     text-align:left;
@@ -287,7 +289,7 @@ body{
 }
 
 .card span{
-    color:#7fa89b;
+    color:#6b7280;
     font-size:14px;
 }
 
@@ -344,8 +346,8 @@ body{
 }
 
 .user .avatar{
-    background:#1f3b34;
-    color:#c8e6de;
+    background:#1f2937;
+    color:#d1d5db;
     order:1;
 }
 
@@ -363,15 +365,15 @@ body{
 }
 
 .bot .message{
-    background:#132420;
-    border:1px solid #1f3b34;
+    background:#0a0a0a;
+    border:1px solid #1f2937;
 }
 
 .file-attached-tag{
     display:inline-flex;
     align-items:center;
     gap:6px;
-    background:rgba(255,255,255,.15);
+    background:rgba(255,255,255,.1);
     padding:5px 10px;
     border-radius:8px;
     font-size:12px;
@@ -422,7 +424,7 @@ body{
 
 .chat-input{
     padding:20px;
-    border-top:1px solid #16261f;
+    border-top:1px solid #1a1a1a;
     display:flex;
     align-items:flex-end;
     gap:12px;
@@ -432,8 +434,8 @@ body{
     width:48px;
     height:48px;
     border:none;
-    background:#132420;
-    color:#7fa89b;
+    background:#0a0a0a;
+    color:#6b7280;
     border-radius:14px;
     cursor:pointer;
     font-size:17px;
@@ -442,13 +444,13 @@ body{
 }
 
 #attachBtn:hover{
-    background:#1f3b34;
+    background:#1f2937;
     color:#fff;
 }
 
 .input-wrapper{
     flex:1;
-    background:#132420;
+    background:#0a0a0a;
     border-radius:14px;
     padding:6px 15px;
 }
@@ -457,11 +459,11 @@ body{
     display:flex;
     align-items:center;
     gap:8px;
-    background:#1f3b34;
+    background:#1f2937;
     padding:8px 12px;
     border-radius:10px;
     font-size:13px;
-    color:#c8e6de;
+    color:#d1d5db;
     margin:8px 0;
     width:fit-content;
 }
@@ -472,7 +474,7 @@ body{
 
 .remove-file{
     cursor:pointer;
-    color:#7fa89b;
+    color:#6b7280;
     margin-left:4px;
 }
 
