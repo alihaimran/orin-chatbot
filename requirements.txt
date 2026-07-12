@@ -2,5 +2,4 @@ fastapi[standard]
 uvicorn[standard]
 groq
 chromadb
-sentence-transformers
 python-dotenv
