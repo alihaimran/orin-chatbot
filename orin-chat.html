@@ -111,6 +111,7 @@
 
             <div class="status">
 
+                <span class="status-dot"></span>
                 Ready
 
             </div>
@@ -190,11 +191,27 @@
 
         <div class="chat-input">
 
-            <textarea
-                placeholder="Message ARX AI..."
-                rows="1"></textarea>
+            <input type="file" id="fileInput" accept=".txt,.md,.csv,.json" hidden>
 
-            <button>
+            <button id="attachBtn" title="Attach a text file">
+                <i class="fa-solid fa-paperclip"></i>
+            </button>
+
+            <div class="input-wrapper">
+
+                <div id="filePreview" class="file-preview" style="display:none;">
+                    <i class="fa-solid fa-file-lines"></i>
+                    <span id="fileName"></span>
+                    <i class="fa-solid fa-xmark remove-file" id="removeFile" title="Remove file"></i>
+                </div>
+
+                <textarea
+                    placeholder="Message ARX AI..."
+                    rows="1"></textarea>
+
+            </div>
+
+            <button id="sendBtn">
 
                 <i class="fa-solid fa-paper-plane"></i>
 
