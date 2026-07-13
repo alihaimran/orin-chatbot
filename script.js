@@ -103,18 +103,11 @@ function createMessage(message, sender, fileTag) {
 
     div.className = sender;
 
-    const avatarHTML = `
-        <div class="avatar">
-            ${sender === "bot" ? '<i class="fa-solid fa-robot"></i>' : '<i class="fa-solid fa-user"></i>'}
-        </div>
-    `;
-
     const fileTagHTML = fileTag
         ? `<div class="file-attached-tag"><i class="fa-solid fa-paperclip"></i> ${fileTag}</div><br>`
         : "";
 
     div.innerHTML = `
-        ${avatarHTML}
         <div class="message">
             ${fileTagHTML}${message}
         </div>
@@ -135,7 +128,6 @@ function typingAnimation(){
     div.className = "bot";
 
     div.innerHTML = `
-    <div class="avatar"><i class="fa-solid fa-robot"></i></div>
     <div class="message typing">
         <span></span>
         <span></span>
