@@ -36,6 +36,23 @@ const API_URL = "https://orin-chatbot.fastapicloud.dev/chat";
 let attachedFile = null;
 
 // ==============================
+// Bot Avatar (same pulse logo as sidebar)
+// ==============================
+
+const AVATAR_SVG = `
+<svg viewBox="0 0 120 120" width="22" height="22" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <radialGradient id="avatarPulseGrad" cx="0.5" cy="0.5" r="0.6">
+            <stop offset="0" stop-color="#e5fffa"/>
+            <stop offset="0.5" stop-color="#2dd4bf"/>
+            <stop offset="1" stop-color="#0d9488"/>
+        </radialGradient>
+    </defs>
+    <circle cx="60" cy="60" r="30" fill="none" stroke="#0d9488" stroke-width="6" opacity="0.5"/>
+    <circle cx="60" cy="60" r="14" fill="url(#avatarPulseGrad)"/>
+</svg>`;
+
+// ==============================
 // Chat History (persisted in localStorage)
 // ==============================
 
@@ -411,7 +428,7 @@ function renderMessage(message, sender, fileTag, time) {
 
     const avatar = document.createElement("div");
     avatar.className = "avatar";
-    avatar.textContent = "O";
+    avatar.innerHTML = AVATAR_SVG;
 
     const content = document.createElement("div");
     content.className = "bot-content";
@@ -492,7 +509,7 @@ function typingAnimation(){
     div.className = "bot";
 
     div.innerHTML = `
-        <div class="avatar">O</div>
+        <div class="avatar">${AVATAR_SVG}</div>
         <div class="message typing">
             <span></span>
             <span></span>
