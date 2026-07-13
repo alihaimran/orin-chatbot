@@ -55,6 +55,20 @@ function makeTitle(text){
     return trimmed.length > 32 ? trimmed.slice(0, 32) + "…" : trimmed;
 }
 
+// Builds a plain-text transcript of everything said so far in this chat,
+// so it can be sent to the backend and the bot has memory of the conversation.
+function buildHistoryPrompt(chat){
+
+    if (!chat || chat.messages.length === 0) return "";
+
+    const lines = chat.messages.map(m => {
+        const role = m.sender === "user" ? "User" : "Assistant";
+        return `${role}: ${m.text}`;
+    });
+
+    return "Previous conversation so far:\n" + lines.join("\n") + "\n\n";
+}
+
 function renderHistory(){
 
     chatHistoryEl.innerHTML = "";
@@ -75,10 +89,16 @@ function renderHistory(){
         item.innerHTML = `
             <i class="fa-regular fa-message"></i>
             <span>${escapeHTML(chat.title)}</span>
+            <i class="fa-regular fa-pen-to-square history-edit" title="Rename"></i>
             <i class="fa-solid fa-xmark history-delete" title="Delete"></i>
         `;
 
         item.addEventListener("click", () => switchChat(chat.id));
+
+        item.querySelector(".history-edit").addEventListener("click", (e) => {
+            e.stopPropagation();
+            renameChat(chat.id);
+        });
 
         item.querySelector(".history-delete").addEventListener("click", (e) => {
             e.stopPropagation();
@@ -88,6 +108,27 @@ function renderHistory(){
         chatHistoryEl.appendChild(item);
 
     });
+}
+
+function renameChat(id){
+
+    const chat = chats.find(c => c.id === id);
+    if (!chat) return;
+
+    const input = prompt("Rename conversation:", chat.title);
+    if (input === null) return;
+
+    const trimmed = input.trim();
+    if (trimmed === "") return;
+
+    chat.title = trimmed.length > 32 ? trimmed.slice(0, 32) + "…" : trimmed;
+    saveChats();
+
+    if (currentChatId === id){
+        chatTitleEl.textContent = chat.title;
+    }
+
+    renderHistory();
 }
 
 function escapeHTML(str){
@@ -227,24 +268,93 @@ function clearAttachedFile() {
 function renderMessage(message, sender, fileTag) {
 
     const div = document.createElement("div");
-
     div.className = sender;
 
-    const fileTagHTML = fileTag
-        ? `<div class="file-attached-tag"><i class="fa-solid fa-paperclip"></i> ${escapeHTML(fileTag)}</div><br>`
-        : "";
+    const bubble = document.createElement("div");
+    bubble.className = "message";
 
-    div.innerHTML = `
-        <div class="message">
-            ${fileTagHTML}${message}
-        </div>
-    `;
+    if (fileTag){
+        const tag = document.createElement("div");
+        tag.className = "file-attached-tag";
+        tag.innerHTML = `<i class="fa-solid fa-paperclip"></i> ${escapeHTML(fileTag)}`;
+        bubble.appendChild(tag);
+        bubble.appendChild(document.createElement("br"));
+    }
+
+    const textSpan = document.createElement("span");
+    textSpan.textContent = message;
+    bubble.appendChild(textSpan);
+
+    div.appendChild(bubble);
+
+    // Voice + Copy actions (bot messages only)
+    if (sender === "bot"){
+
+        const actions = document.createElement("div");
+        actions.className = "msg-actions";
+
+        const speakBtn = document.createElement("i");
+        speakBtn.className = "fa-solid fa-volume-high msg-action-icon";
+        speakBtn.title = "Listen";
+        speakBtn.addEventListener("click", () => speakMessage(message, speakBtn));
+
+        const copyBtn = document.createElement("i");
+        copyBtn.className = "fa-regular fa-copy msg-action-icon";
+        copyBtn.title = "Copy";
+        copyBtn.addEventListener("click", () => copyMessage(message, copyBtn));
+
+        actions.appendChild(speakBtn);
+        actions.appendChild(copyBtn);
+        div.appendChild(actions);
+    }
 
     chatArea.appendChild(div);
 
     chatArea.scrollTop = chatArea.scrollHeight;
 
     return div;
+}
+
+function speakMessage(text, btn){
+
+    if (!("speechSynthesis" in window)){
+        alert("Voice playback isn't supported in this browser.");
+        return;
+    }
+
+    if (window.speechSynthesis.speaking){
+        window.speechSynthesis.cancel();
+        btn.classList.remove("fa-volume-xmark");
+        btn.classList.add("fa-volume-high");
+        return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+
+    utterance.onend = () => {
+        btn.classList.remove("fa-volume-xmark");
+        btn.classList.add("fa-volume-high");
+    };
+
+    btn.classList.remove("fa-volume-high");
+    btn.classList.add("fa-volume-xmark");
+
+    window.speechSynthesis.speak(utterance);
+}
+
+function copyMessage(text, btn){
+
+    navigator.clipboard.writeText(text).then(() => {
+        btn.classList.remove("fa-regular");
+        btn.classList.add("fa-solid");
+        btn.title = "Copied!";
+
+        setTimeout(() => {
+            btn.classList.remove("fa-solid");
+            btn.classList.add("fa-regular");
+            btn.title = "Copy";
+        }, 1200);
+    });
 }
 
 // Renders AND saves the message into the active chat
@@ -309,6 +419,10 @@ async function sendMessage(){
         renderHistory();
     }
 
+    // Grab everything said so far in this chat BEFORE we add the new message
+    const chatForHistory = getCurrentChat();
+    const historyPrompt = buildHistoryPrompt(chatForHistory);
+
     // What the user sees in the chat bubble (also persisted)
     createMessage(text || "(sent a file)", "user", attachedFile ? attachedFile.name : null);
 
@@ -320,6 +434,10 @@ async function sendMessage(){
             `The user attached a file named "${attachedFile.name}" with the following content:\n\n` +
             `${attachedFile.content}\n\n` +
             `User's message: ${text || "(no additional message, just discuss the file)"}`;
+    }
+
+    if (historyPrompt){
+        messageToSend = historyPrompt + "User: " + messageToSend;
     }
 
     textarea.value = "";
