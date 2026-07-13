@@ -25,6 +25,10 @@ const exportChatBtn = document.getElementById("exportChatBtn");
 const clearCurrentChatBtn = document.getElementById("clearCurrentChatBtn");
 const deleteCurrentChatBtn = document.getElementById("deleteCurrentChatBtn");
 
+const menuToggle = document.getElementById("menuToggle");
+const sidebar = document.querySelector(".sidebar");
+const sidebarOverlay = document.getElementById("sidebarOverlay");
+
 // FastAPI URL (live backend)
 const API_URL = "https://orin-chatbot.fastapicloud.dev/chat";
 
@@ -70,7 +74,6 @@ function formatTime(timestamp){
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
-// Builds a plain-text transcript of everything said so far in this chat
 function buildHistoryPrompt(chat){
 
     if (!chat || chat.messages.length === 0) return "";
@@ -403,7 +406,6 @@ function renderMessage(message, sender, fileTag, time) {
         return div;
     }
 
-    // Bot message
     const div = document.createElement("div");
     div.className = "bot";
 
@@ -469,7 +471,6 @@ function copyMessage(text, btn){
     });
 }
 
-// Renders AND saves the message into the active chat
 function createMessage(message, sender, fileTag) {
 
     const time = Date.now();
@@ -485,7 +486,6 @@ function createMessage(message, sender, fileTag) {
     return div;
 }
 
-// Typing
 function typingAnimation(){
 
     const div = document.createElement("div");
@@ -549,4 +549,49 @@ async function sendMessage(){
     }
 
     textarea.value = "";
+    textarea.style.height = "auto";
+    clearAttachedFile();
+
+    const typing = typingAnimation();
+
+    try{
+
+        const response = await fetch(API_URL,{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                message: messageToSend
+            })
+        });
+
+        const data = await response.json();
+
+        typing.remove();
+        createMessage(data.reply, "bot");
+
+    }
+    catch(error){
+
+        typing.remove();
+        createMessage("⚠ Unable to connect to FastAPI server.", "bot");
+        console.error(error);
+
+    }
+
 }
+
+// ==============================
+// Mobile Sidebar Toggle
+// ==============================
+
+menuToggle.addEventListener("click", () => {
+    sidebar.classList.toggle("open");
+    sidebarOverlay.classList.toggle("show");
+});
+
+sidebarOverlay.addEventListener("click", () => {
+    sidebar.classList.remove("open");
+    sidebarOverlay.classList.remove("show");
+});
