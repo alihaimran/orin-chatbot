@@ -83,6 +83,7 @@ body{
     font-size:22px;
     font-weight:600;
     color:#fff;
+    letter-spacing:.3px;
 }
 
 /* New Chat */
@@ -132,29 +133,43 @@ body{
     cursor:pointer;
     transition:.3s;
     color:#d1d5db;
+    position:relative;
+}
+
+.history-item span{
+    flex:1;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
 }
 
 .history-item:hover{
     background:#111827;
 }
 
+.history-item:hover .history-delete{
+    opacity:1;
+}
+
 .history-item.active{
     background:#0d2b24;
 }
 
-/* Footer */
-
-.sidebar-footer{
-    border-top:1px solid #181818;
-    padding-top:18px;
-    display:flex;
-    align-items:center;
-    gap:10px;
-    color:#777;
+.history-delete{
+    opacity:0;
+    color:#6b7280;
+    font-size:12px;
+    transition:.2s;
 }
 
-.sidebar-footer i{
-    color:#22c55e;
+.history-delete:hover{
+    color:#ef4444;
+}
+
+.history-empty{
+    color:#4b5563;
+    font-size:13px;
+    padding:12px;
 }
 
 /* ================= Main ================= */
@@ -172,8 +187,8 @@ body{
     height:70px;
     border-bottom:1px solid #181818;
     display:flex;
-    justify-content:space-between;
     align-items:center;
+    gap:15px;
     padding:0 35px;
 }
 
@@ -182,34 +197,6 @@ body{
     font-weight:600;
 }
 
-.status{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    color:#22c55e;
-    font-size:14px;
-}
-
-.status-dot{
-    width:8px;
-    height:8px;
-    border-radius:50%;
-    background:#22c55e;
-    box-shadow:0 0 10px #22c55e;
-    animation:pulse 2s infinite;
-}
-
-@keyframes pulse{
-
-0%,100%{
-opacity:1;
-}
-
-50%{
-opacity:.4;
-}
-
-}
 /* =========================================
    Welcome Section
 ========================================= */
@@ -588,10 +575,6 @@ transform:translateY(-5px);
 
     .title{
         font-size:16px;
-    }
-
-    .status span:not(.status-dot){
-        display:none;
     }
 
     .welcome h1{

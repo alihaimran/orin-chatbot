@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>ARX AI Assistant</title>
+    <title>Orin</title>
 
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -28,10 +28,10 @@
         <div class="logo">
 
             <div class="logo-icon">
-                AI
+                O
             </div>
 
-            <h2>ARX AI</h2>
+            <h2>Orin</h2>
 
         </div>
 
@@ -49,47 +49,12 @@
 
         </div>
 
-        <div class="chat-history">
+        <!-- Chat history is rendered dynamically by script.js -->
+        <div class="chat-history" id="chatHistory">
 
-            <div class="history-item active">
-
-                <i class="fa-regular fa-message"></i>
-
-                Explain Machine Learning
-
+            <div class="history-empty">
+                No conversations yet
             </div>
-
-            <div class="history-item">
-
-                <i class="fa-regular fa-message"></i>
-
-                Python Interview
-
-            </div>
-
-            <div class="history-item">
-
-                <i class="fa-regular fa-message"></i>
-
-                AI Roadmap
-
-            </div>
-
-            <div class="history-item">
-
-                <i class="fa-regular fa-message"></i>
-
-                Portfolio Design
-
-            </div>
-
-        </div>
-
-        <div class="sidebar-footer">
-
-            <i class="fa-solid fa-circle-check"></i>
-
-            Connected
 
         </div>
 
@@ -107,16 +72,9 @@
                 <i class="fa-solid fa-bars"></i>
             </button>
 
-            <div class="title">
+            <div class="title" id="chatTitle">
 
                 New Conversation
-
-            </div>
-
-            <div class="status">
-
-                <span class="status-dot"></span>
-                Ready
 
             </div>
 
@@ -210,7 +168,7 @@
                 </div>
 
                 <textarea
-                    placeholder="Message ARX AI..."
+                    placeholder="Message Orin..."
                     rows="1"></textarea>
 
             </div>

@@ -1,11 +1,14 @@
 // ==============================
-// ARX AI Chat UI
+// Orin Chat UI
 // ==============================
 
 const textarea = document.querySelector("textarea");
 const sendBtn = document.getElementById("sendBtn");
 const chatArea = document.getElementById("chatArea");
 const newChatBtn = document.querySelector(".new-chat");
+const chatHistoryEl = document.getElementById("chatHistory");
+const chatTitleEl = document.getElementById("chatTitle");
+const welcomeEl = document.querySelector(".welcome");
 
 const attachBtn = document.getElementById("attachBtn");
 const fileInput = document.getElementById("fileInput");
@@ -18,6 +21,134 @@ const API_URL = "https://orin-chatbot.fastapicloud.dev/chat";
 
 // Currently attached file (name + text content)
 let attachedFile = null;
+
+// ==============================
+// Chat History (persisted in localStorage)
+// ==============================
+
+const STORAGE_KEY = "orin_chats";
+
+let chats = loadChats();
+let currentChatId = null;
+
+function loadChats(){
+    try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+    }
+    catch(e){
+        return [];
+    }
+}
+
+function saveChats(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(chats));
+}
+
+function getCurrentChat(){
+    return chats.find(c => c.id === currentChatId) || null;
+}
+
+function makeTitle(text){
+    if (!text) return "Attached file";
+    const trimmed = text.trim();
+    return trimmed.length > 32 ? trimmed.slice(0, 32) + "…" : trimmed;
+}
+
+function renderHistory(){
+
+    chatHistoryEl.innerHTML = "";
+
+    if (chats.length === 0){
+        const empty = document.createElement("div");
+        empty.className = "history-empty";
+        empty.textContent = "No conversations yet";
+        chatHistoryEl.appendChild(empty);
+        return;
+    }
+
+    chats.forEach(chat => {
+
+        const item = document.createElement("div");
+        item.className = "history-item" + (chat.id === currentChatId ? " active" : "");
+
+        item.innerHTML = `
+            <i class="fa-regular fa-message"></i>
+            <span>${escapeHTML(chat.title)}</span>
+            <i class="fa-solid fa-xmark history-delete" title="Delete"></i>
+        `;
+
+        item.addEventListener("click", () => switchChat(chat.id));
+
+        item.querySelector(".history-delete").addEventListener("click", (e) => {
+            e.stopPropagation();
+            deleteChat(chat.id);
+        });
+
+        chatHistoryEl.appendChild(item);
+
+    });
+}
+
+function escapeHTML(str){
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+function switchChat(id){
+
+    currentChatId = id;
+    const chat = getCurrentChat();
+
+    if (!chat) return;
+
+    chatTitleEl.textContent = chat.title;
+    chatArea.innerHTML = "";
+
+    if (chat.messages.length === 0){
+        welcomeEl.style.display = "block";
+    } else {
+        welcomeEl.style.display = "none";
+        chat.messages.forEach(m => renderMessage(m.text, m.sender, m.fileTag));
+    }
+
+    renderHistory();
+    closeMobileSidebar();
+}
+
+function deleteChat(id){
+
+    chats = chats.filter(c => c.id !== id);
+    saveChats();
+
+    if (currentChatId === id){
+        currentChatId = null;
+        chatArea.innerHTML = "";
+        chatTitleEl.textContent = "New Conversation";
+        welcomeEl.style.display = "block";
+    }
+
+    renderHistory();
+}
+
+function startNewChat(){
+    currentChatId = null;
+    chatArea.innerHTML = "";
+    chatTitleEl.textContent = "New Conversation";
+    welcomeEl.style.display = "block";
+    clearAttachedFile();
+    renderHistory();
+    closeMobileSidebar();
+}
+
+function closeMobileSidebar(){
+    sidebar.classList.remove("open");
+    sidebarOverlay.classList.remove("show");
+}
+
+// Initial render
+renderHistory();
 
 // Auto Height
 textarea.addEventListener("input", () => {
@@ -37,11 +168,7 @@ textarea.addEventListener("keydown", (e) => {
 sendBtn.addEventListener("click", sendMessage);
 
 // New Chat
-newChatBtn.addEventListener("click", () => {
-    chatArea.innerHTML = "";
-    document.querySelector(".welcome").style.display = "block";
-    clearAttachedFile();
-});
+newChatBtn.addEventListener("click", startNewChat);
 
 // ==============================
 // File Attach Handling
@@ -94,17 +221,17 @@ function clearAttachedFile() {
 }
 
 // ==============================
-// Message Rendering
+// Message Rendering (visual only, no persistence)
 // ==============================
 
-function createMessage(message, sender, fileTag) {
+function renderMessage(message, sender, fileTag) {
 
     const div = document.createElement("div");
 
     div.className = sender;
 
     const fileTagHTML = fileTag
-        ? `<div class="file-attached-tag"><i class="fa-solid fa-paperclip"></i> ${fileTag}</div><br>`
+        ? `<div class="file-attached-tag"><i class="fa-solid fa-paperclip"></i> ${escapeHTML(fileTag)}</div><br>`
         : "";
 
     div.innerHTML = `
@@ -116,6 +243,21 @@ function createMessage(message, sender, fileTag) {
     chatArea.appendChild(div);
 
     chatArea.scrollTop = chatArea.scrollHeight;
+
+    return div;
+}
+
+// Renders AND saves the message into the active chat
+function createMessage(message, sender, fileTag) {
+
+    const div = renderMessage(message, sender, fileTag);
+
+    const chat = getCurrentChat();
+
+    if (chat){
+        chat.messages.push({ sender, text: message, fileTag: fileTag || null });
+        saveChats();
+    }
 
     return div;
 }
@@ -149,9 +291,25 @@ async function sendMessage(){
 
     if (text === "" && !attachedFile) return;
 
-    document.querySelector(".welcome").style.display = "none";
+    welcomeEl.style.display = "none";
 
-    // What the user sees in the chat bubble
+    // If this is the first message of a fresh chat, create the conversation now
+    if (currentChatId === null){
+
+        const chat = {
+            id: Date.now(),
+            title: makeTitle(text || (attachedFile ? attachedFile.name : "New chat")),
+            messages: []
+        };
+
+        chats.unshift(chat);
+        currentChatId = chat.id;
+        chatTitleEl.textContent = chat.title;
+        saveChats();
+        renderHistory();
+    }
+
+    // What the user sees in the chat bubble (also persisted)
     createMessage(text || "(sent a file)", "user", attachedFile ? attachedFile.name : null);
 
     // What actually gets sent to the backend
