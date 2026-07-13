@@ -315,8 +315,7 @@ opacity:.4;
 .bot{
     display:flex;
     align-items:flex-end;
-    gap:10px;
-    margin-bottom:22px;
+    margin-bottom:18px;
     animation:fadeIn .3s ease;
 }
 
@@ -332,39 +331,11 @@ opacity:.4;
     justify-content:flex-start;
 }
 
-/* --------- Simple Avatars ---------
-   Flat, minimal, same color theme
---------------------------------*/
+/* Avatars Removed */
 
 .avatar{
-    width:34px;
-    height:34px;
-    min-width:34px;
-    border-radius:50%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:14px;
-    flex-shrink:0;
+    display:none !important;
 }
-
-.bot .avatar{
-    background:#0d9488;
-    color:#fff;
-    order:-1;
-}
-
-.user .avatar{
-    background:#1f2937;
-    color:#d1d5db;
-    order:1;
-}
-
-.avatar i{
-    font-size:15px;
-}
-
-/* Message Bubble */
 
 /* Message Bubble */
 
@@ -382,108 +353,179 @@ opacity:.4;
 /* User Bubble */
 
 .user .message{
-
     background:#0d9488;
     color:#fff;
-
-    border-bottom-right-radius:6px;
-
+    border-bottom-right-radius:4px;
 }
 
 /* Bot Bubble */
 
 .bot .message{
-
     background:#0b0b0b;
     color:#ffffff;
-
     border:1px solid #1f2937;
-
-    border-bottom-left-radius:6px;
-
+    border-bottom-left-radius:4px;
 }
 
 /* File Tag */
 
 .file-attached-tag{
-
     display:inline-flex;
-
     align-items:center;
-
     gap:6px;
-
     background:rgba(255,255,255,.08);
-
     padding:6px 12px;
-
     border-radius:8px;
-
     font-size:12px;
-
     margin-bottom:10px;
-
 }
 
 /* Typing Animation */
 
 .typing{
-
     display:flex;
-
     gap:6px;
-
     align-items:center;
-
 }
 
 .typing span{
-
     width:8px;
-
     height:8px;
-
     border-radius:50%;
-
     background:#22c55e;
-
     animation:typing 1.2s infinite;
-
 }
 
 .typing span:nth-child(2){
-
     animation-delay:.2s;
-
 }
 
 .typing span:nth-child(3){
-
     animation-delay:.4s;
-
 }
 
 @keyframes typing{
 
 0%,100%{
-
 opacity:.4;
-
 transform:translateY(0);
-
 }
 
 50%{
-
 opacity:1;
-
 transform:translateY(-5px);
-
 }
 
 }
-/* --------- Avatars Removed --------- */
 
-.avatar{
-    display:none !important;
+/* =========================================
+   Chat Input Bar
+========================================= */
+
+.chat-input{
+    display:flex;
+    align-items:flex-end;
+    gap:12px;
+    padding:18px 30px 24px;
+    background:#000;
+    border-top:1px solid #181818;
+}
+
+#attachBtn,
+#sendBtn{
+    width:46px;
+    height:46px;
+    min-width:46px;
+    border:none;
+    outline:none;
+    cursor:pointer;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:17px;
+    transition:.25s;
+}
+
+#attachBtn{
+    background:#0a0a0a;
+    border:1px solid #1f2937;
+    color:#9ca3af;
+}
+
+#attachBtn:hover{
+    border-color:#14b8a6;
+    color:#2dd4bf;
+}
+
+#sendBtn{
+    background:#0d9488;
+    color:#fff;
+}
+
+#sendBtn:hover{
+    background:#14b8a6;
+    transform:translateY(-2px);
+}
+
+.input-wrapper{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    background:#0a0a0a;
+    border:1px solid #1f2937;
+    border-radius:16px;
+    padding:12px 18px;
+    transition:.25s;
+}
+
+.input-wrapper:focus-within{
+    border-color:#14b8a6;
+    box-shadow:0 0 0 3px rgba(20,184,166,.12);
+}
+
+.input-wrapper textarea{
+    width:100%;
+    max-height:160px;
+    background:transparent;
+    border:none;
+    outline:none;
+    resize:none;
+    color:#fff;
+    font-size:15px;
+    line-height:1.6;
+    font-family:'Poppins',sans-serif;
+}
+
+.input-wrapper textarea::placeholder{
+    color:#6b7280;
+}
+
+/* File Preview (attached file above textarea) */
+
+.file-preview{
+    align-items:center;
+    gap:8px;
+    background:rgba(255,255,255,.06);
+    padding:6px 10px;
+    border-radius:8px;
+    font-size:13px;
+    color:#d1d5db;
+    margin-bottom:8px;
+    width:fit-content;
+}
+
+.file-preview i:first-child{
+    color:#2dd4bf;
+}
+
+.remove-file{
+    cursor:pointer;
+    color:#9ca3af;
+    margin-left:4px;
+    transition:.2s;
+}
+
+.remove-file:hover{
+    color:#ef4444;
 }
