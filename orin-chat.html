@@ -6,14 +6,11 @@
 
     <title>Orin</title>
 
-    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Icons -->
     <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
-    <!-- CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -26,36 +23,32 @@
     <aside class="sidebar">
 
         <div class="logo">
-
-            <div class="logo-icon">
-                O
-            </div>
-
+            <div class="logo-icon">O</div>
             <h2>Orin</h2>
-
         </div>
 
         <button class="new-chat">
-
             <i class="fa-solid fa-plus"></i>
-
             New Chat
-
         </button>
 
-        <div class="history-title">
-
-            Recent Chats
-
+        <div class="history-header">
+            <span>RECENT CHATS</span>
+            <button class="clear-history-btn" id="clearHistoryBtn" title="Clear all history">
+                <i class="fa-solid fa-trash"></i>
+            </button>
         </div>
 
-        <!-- Chat history is rendered dynamically by script.js -->
         <div class="chat-history" id="chatHistory">
+            <div class="history-empty">No conversations yet</div>
+        </div>
 
-            <div class="history-empty">
-                No conversations yet
+        <div class="view-all-history" id="viewAllBtn">
+            <div class="left">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>View All History</span>
             </div>
-
+            <i class="fa-solid fa-chevron-right"></i>
         </div>
 
     </aside>
@@ -64,92 +57,76 @@
 
     <main class="main">
 
-        <!-- Top -->
-
         <header class="topbar">
 
             <button class="menu-toggle" id="menuToggle">
                 <i class="fa-solid fa-bars"></i>
             </button>
 
-            <div class="title" id="chatTitle">
+            <div class="title" id="chatTitle">New Conversation</div>
 
-                New Conversation
+            <div class="topbar-right">
+
+                <button class="icon-btn" id="themeToggle" title="Toggle theme">
+                    <i class="fa-solid fa-sun"></i>
+                </button>
+
+                <div class="top-menu-wrapper">
+                    <button class="icon-btn" id="topMenuBtn" title="More options">
+                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                    </button>
+
+                    <div class="top-menu-dropdown" id="topMenuDropdown">
+                        <button id="exportChatBtn"><i class="fa-solid fa-download"></i> Export chat</button>
+                        <button id="clearCurrentChatBtn"><i class="fa-solid fa-broom"></i> Clear this chat</button>
+                        <button id="deleteCurrentChatBtn"><i class="fa-solid fa-trash"></i> Delete this chat</button>
+                    </div>
+                </div>
 
             </div>
 
         </header>
 
-        <!-- Welcome -->
-
         <section class="welcome">
 
-            <h1>
-
-                How can I help you today?
-
-            </h1>
+            <h1>How can I help you today?</h1>
 
             <p>
-
                 Ask anything about AI, Coding, Python, Data Science,
                 Web Development or your Projects.
-
             </p>
 
             <div class="cards">
 
                 <div class="card">
-
                     <i class="fa-solid fa-code"></i>
-
                     <h3>Write Code</h3>
-
                     <span>Create HTML, CSS, JS & Python</span>
-
                 </div>
 
                 <div class="card">
-
                     <i class="fa-solid fa-lightbulb"></i>
-
                     <h3>Brainstorm</h3>
-
                     <span>Generate creative ideas</span>
-
                 </div>
 
                 <div class="card">
-
                     <i class="fa-solid fa-bug"></i>
-
                     <h3>Debug</h3>
-
                     <span>Find and fix bugs</span>
-
                 </div>
 
                 <div class="card">
-
                     <i class="fa-solid fa-graduation-cap"></i>
-
                     <h3>Learn AI</h3>
-
                     <span>Understand concepts easily</span>
-
                 </div>
 
             </div>
 
         </section>
 
-        <!-- Chat Area -->
-
-        <section class="chat-area" id="chatArea">
-
-        </section>
-
-        <!-- Input -->
+        <section class="chat-area" id="chatArea"></section>
 
         <div class="chat-input">
 
@@ -167,16 +144,12 @@
                     <i class="fa-solid fa-xmark remove-file" id="removeFile" title="Remove file"></i>
                 </div>
 
-                <textarea
-                    placeholder="Message Orin..."
-                    rows="1"></textarea>
+                <textarea placeholder="Message Orin..." rows="1"></textarea>
 
             </div>
 
             <button id="sendBtn">
-
                 <i class="fa-solid fa-paper-plane"></i>
-
             </button>
 
         </div>

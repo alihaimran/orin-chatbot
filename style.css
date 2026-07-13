@@ -19,6 +19,7 @@ body{
     background:#000;
     color:#fff;
     overflow:hidden;
+    transition:background .3s ease,color .3s ease;
 }
 
 /* Scrollbar */
@@ -109,18 +110,46 @@ body{
     transform:translateY(-2px);
 }
 
-/* History */
+/* History header row (title + clear-all icon) */
 
-.history-title{
+.history-header{
     margin-top:35px;
     margin-bottom:15px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.history-header span{
     color:#777;
     font-size:14px;
+    letter-spacing:.4px;
 }
+
+.clear-history-btn{
+    background:none;
+    border:none;
+    color:#6b7280;
+    font-size:14px;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.clear-history-btn:hover{
+    color:#ef4444;
+}
+
+/* History */
 
 .chat-history{
     flex:1;
     overflow:auto;
+    max-height:290px;
+    transition:max-height .3s ease;
+}
+
+.chat-history.expanded{
+    max-height:none;
 }
 
 .history-item{
@@ -154,6 +183,7 @@ body{
 
 .history-item.active{
     background:#0d2b24;
+    border-left:2px solid #2dd4bf;
 }
 
 .history-delete,
@@ -176,6 +206,32 @@ body{
     color:#4b5563;
     font-size:13px;
     padding:12px;
+}
+
+/* View All History (bottom of sidebar) */
+
+.view-all-history{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-top:14px;
+    padding-top:16px;
+    border-top:1px solid #181818;
+    color:#2dd4bf;
+    font-size:13.5px;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.view-all-history:hover{
+    color:#5eead4;
+}
+
+.view-all-history .left{
+    display:flex;
+    align-items:center;
+    gap:10px;
 }
 
 /* ================= Main ================= */
@@ -201,6 +257,70 @@ body{
 .title{
     font-size:20px;
     font-weight:600;
+}
+
+.topbar-right{
+    margin-left:auto;
+    display:flex;
+    align-items:center;
+    gap:18px;
+    position:relative;
+}
+
+.icon-btn{
+    background:none;
+    border:none;
+    color:#9ca3af;
+    font-size:17px;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.icon-btn:hover{
+    color:#fff;
+}
+
+.top-menu-wrapper{
+    position:relative;
+}
+
+.top-menu-dropdown{
+    position:absolute;
+    right:0;
+    top:130%;
+    background:#0a0a0a;
+    border:1px solid #1f2937;
+    border-radius:10px;
+    min-width:190px;
+    display:none;
+    flex-direction:column;
+    overflow:hidden;
+    z-index:50;
+    box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
+
+.top-menu-dropdown.show{
+    display:flex;
+}
+
+.top-menu-dropdown button{
+    width:100%;
+    text-align:left;
+    padding:11px 16px;
+    background:transparent;
+    border:none;
+    color:#d1d5db;
+    font-size:13px;
+    cursor:pointer;
+    transition:.2s;
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.top-menu-dropdown button:hover{
+    background:#111827;
+    color:#2dd4bf;
 }
 
 /* =========================================
@@ -308,8 +428,9 @@ body{
 .bot{
     display:flex;
     align-items:flex-end;
-    margin-bottom:18px;
+    margin-bottom:22px;
     animation:fadeIn .3s ease;
+    gap:10px;
 }
 
 /* User Right Side */
@@ -318,44 +439,48 @@ body{
     justify-content:flex-end;
 }
 
+.user-content{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    max-width:60%;
+}
+
 /* Bot Left Side */
 
 .bot{
     justify-content:flex-start;
+    align-items:flex-end;
+}
+
+.bot-content{
+    display:flex;
     flex-direction:column;
     align-items:flex-start;
+    max-width:60%;
 }
 
-/* Copy / Voice icons under bot messages */
-
-.msg-actions{
-    display:flex;
-    gap:16px;
-    margin-top:6px;
-    padding-left:4px;
-}
-
-.msg-action-icon{
-    color:#6b7280;
-    font-size:13px;
-    cursor:pointer;
-    transition:.2s;
-}
-
-.msg-action-icon:hover{
-    color:#2dd4bf;
-}
-
-/* Avatars Removed */
+/* Avatar (bot only) */
 
 .avatar{
-    display:none !important;
+    width:36px;
+    height:36px;
+    min-width:36px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(135deg,#0d9488,#22c55e);
+    color:#fff;
+    font-weight:700;
+    font-size:14px;
+    box-shadow:0 0 14px rgba(34,197,94,.25);
 }
 
 /* Message Bubble */
 
 .message{
-    max-width:60%;
+    max-width:100%;
     width:fit-content;
     padding:10px 16px;
     border-radius:16px;
@@ -382,6 +507,32 @@ body{
     border-bottom-left-radius:4px;
 }
 
+/* Timestamp + read receipt (user) */
+
+.user-meta{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:11px;
+    color:#6b7280;
+    margin-top:5px;
+    padding-right:2px;
+}
+
+.read-receipt{
+    color:#2dd4bf;
+    font-size:12px;
+}
+
+/* Timestamp (bot) */
+
+.msg-time{
+    font-size:11px;
+    color:#6b7280;
+    margin-top:5px;
+    padding-left:2px;
+}
+
 /* File Tag */
 
 .file-attached-tag{
@@ -393,6 +544,38 @@ body{
     border-radius:8px;
     font-size:12px;
     margin-bottom:10px;
+}
+
+/* Copy / Download actions under bot messages */
+
+.msg-actions{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-top:8px;
+    padding-left:2px;
+}
+
+.msg-action{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    color:#6b7280;
+    font-size:12.5px;
+    cursor:pointer;
+    transition:.2s;
+    background:none;
+    border:none;
+    font-family:'Poppins',sans-serif;
+}
+
+.msg-action:hover{
+    color:#2dd4bf;
+}
+
+.msg-action-divider{
+    color:#374151;
+    font-size:12px;
 }
 
 /* Typing Animation */
@@ -544,6 +727,7 @@ transform:translateY(-5px);
 .remove-file:hover{
     color:#ef4444;
 }
+
 /* =========================================
    Mobile Menu Toggle Button
 ========================================= */
@@ -570,6 +754,72 @@ transform:translateY(-5px);
 
 .sidebar-overlay.show{
     display:block;
+}
+
+/* =========================================
+   Light Theme
+========================================= */
+
+body.light-theme{
+    background:#f4f5f7;
+    color:#111827;
+}
+
+body.light-theme .sidebar{
+    background:#ffffff;
+    border-right:1px solid #e5e7eb;
+}
+
+body.light-theme .main{
+    background:#f4f5f7;
+}
+
+body.light-theme .topbar{
+    border-bottom:1px solid #e5e7eb;
+}
+
+body.light-theme .history-item{
+    color:#374151;
+}
+
+body.light-theme .history-item:hover{
+    background:#f0f2f5;
+}
+
+body.light-theme .history-item.active{
+    background:#e6fbf8;
+}
+
+body.light-theme .card,
+body.light-theme .bot .message{
+    background:#ffffff;
+    border:1px solid #e5e7eb;
+    color:#111827;
+}
+
+body.light-theme .input-wrapper,
+body.light-theme #attachBtn{
+    background:#ffffff;
+    border:1px solid #e5e7eb;
+    color:#111827;
+}
+
+body.light-theme .input-wrapper textarea{
+    color:#111827;
+}
+
+body.light-theme .chat-input{
+    background:#f4f5f7;
+    border-top:1px solid #e5e7eb;
+}
+
+body.light-theme .top-menu-dropdown{
+    background:#ffffff;
+    border:1px solid #e5e7eb;
+}
+
+body.light-theme .top-menu-dropdown button{
+    color:#374151;
 }
 
 /* =========================================
@@ -622,9 +872,9 @@ transform:translateY(-5px);
         padding:15px;
     }
 
-    .message{
+    .user-content,
+    .bot-content{
         max-width:85%;
-        font-size:14px;
     }
 
     .chat-input{

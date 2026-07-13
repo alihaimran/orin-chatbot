@@ -16,7 +16,6 @@ TABLE_NAME = "articles"
 ID_COLUMN = "id"                 
 TEXT_COLUMN = "content"               
 SOURCE_COLUMN = None                  
-
 CHROMA_PATH = "./chroma_db"
 COLLECTION_NAME = "knowledge_base"
 CHUNK_SIZE = 500

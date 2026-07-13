@@ -16,6 +16,15 @@ const filePreview = document.getElementById("filePreview");
 const fileNameSpan = document.getElementById("fileName");
 const removeFileBtn = document.getElementById("removeFile");
 
+const clearHistoryBtn = document.getElementById("clearHistoryBtn");
+const viewAllBtn = document.getElementById("viewAllBtn");
+const themeToggle = document.getElementById("themeToggle");
+const topMenuBtn = document.getElementById("topMenuBtn");
+const topMenuDropdown = document.getElementById("topMenuDropdown");
+const exportChatBtn = document.getElementById("exportChatBtn");
+const clearCurrentChatBtn = document.getElementById("clearCurrentChatBtn");
+const deleteCurrentChatBtn = document.getElementById("deleteCurrentChatBtn");
+
 // FastAPI URL (live backend)
 const API_URL = "https://orin-chatbot.fastapicloud.dev/chat";
 
@@ -27,6 +36,7 @@ let attachedFile = null;
 // ==============================
 
 const STORAGE_KEY = "orin_chats";
+const THEME_KEY = "orin_theme";
 
 let chats = loadChats();
 let currentChatId = null;
@@ -55,8 +65,12 @@ function makeTitle(text){
     return trimmed.length > 32 ? trimmed.slice(0, 32) + "…" : trimmed;
 }
 
-// Builds a plain-text transcript of everything said so far in this chat,
-// so it can be sent to the backend and the bot has memory of the conversation.
+function formatTime(timestamp){
+    const date = timestamp ? new Date(timestamp) : new Date();
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+// Builds a plain-text transcript of everything said so far in this chat
 function buildHistoryPrompt(chat){
 
     if (!chat || chat.messages.length === 0) return "";
@@ -151,7 +165,7 @@ function switchChat(id){
         welcomeEl.style.display = "block";
     } else {
         welcomeEl.style.display = "none";
-        chat.messages.forEach(m => renderMessage(m.text, m.sender, m.fileTag));
+        chat.messages.forEach(m => renderMessage(m.text, m.sender, m.fileTag, m.time));
     }
 
     renderHistory();
@@ -164,10 +178,8 @@ function deleteChat(id){
     saveChats();
 
     if (currentChatId === id){
-        currentChatId = null;
-        chatArea.innerHTML = "";
-        chatTitleEl.textContent = "New Conversation";
-        welcomeEl.style.display = "block";
+        startNewChat();
+        return;
     }
 
     renderHistory();
@@ -205,11 +217,98 @@ textarea.addEventListener("keydown", (e) => {
     }
 });
 
-// Send Button
 sendBtn.addEventListener("click", sendMessage);
-
-// New Chat
 newChatBtn.addEventListener("click", startNewChat);
+
+// ==============================
+// Sidebar: Clear all history / View all
+// ==============================
+
+clearHistoryBtn.addEventListener("click", () => {
+    if (chats.length === 0) return;
+    if (confirm("Delete all conversations? This can't be undone.")) {
+        chats = [];
+        saveChats();
+        startNewChat();
+    }
+});
+
+viewAllBtn.addEventListener("click", () => {
+    chatHistoryEl.classList.toggle("expanded");
+    const chevron = viewAllBtn.querySelector(".fa-chevron-right, .fa-chevron-down");
+    if (chevron) {
+        chevron.classList.toggle("fa-chevron-right");
+        chevron.classList.toggle("fa-chevron-down");
+    }
+});
+
+// ==============================
+// Topbar: theme toggle + 3-dot menu
+// ==============================
+
+function applyTheme(theme){
+    document.body.classList.toggle("light-theme", theme === "light");
+    const icon = themeToggle.querySelector("i");
+    icon.className = theme === "light" ? "fa-solid fa-moon" : "fa-solid fa-sun";
+}
+
+let currentTheme = localStorage.getItem(THEME_KEY) || "dark";
+applyTheme(currentTheme);
+
+themeToggle.addEventListener("click", () => {
+    currentTheme = currentTheme === "dark" ? "light" : "dark";
+    localStorage.setItem(THEME_KEY, currentTheme);
+    applyTheme(currentTheme);
+});
+
+topMenuBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    topMenuDropdown.classList.toggle("show");
+});
+
+document.addEventListener("click", () => {
+    topMenuDropdown.classList.remove("show");
+});
+
+exportChatBtn.addEventListener("click", () => {
+    const chat = getCurrentChat();
+    if (!chat || chat.messages.length === 0) {
+        alert("No conversation to export yet.");
+        return;
+    }
+    const text = chat.messages
+        .map(m => `${m.sender === "user" ? "You" : "Orin"} (${m.time ? formatTime(m.time) : ""}): ${m.text}`)
+        .join("\n\n");
+    downloadTextFile(`${chat.title || "chat"}.txt`, text);
+});
+
+clearCurrentChatBtn.addEventListener("click", () => {
+    const chat = getCurrentChat();
+    if (!chat) return;
+    if (confirm("Clear all messages in this chat?")) {
+        chat.messages = [];
+        saveChats();
+        chatArea.innerHTML = "";
+        welcomeEl.style.display = "block";
+    }
+});
+
+deleteCurrentChatBtn.addEventListener("click", () => {
+    if (!currentChatId) return;
+    if (confirm("Delete this conversation?")) {
+        deleteChat(currentChatId);
+    }
+});
+
+function downloadTextFile(filename, text){
+    const blob = new Blob([text], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+}
 
 // ==============================
 // File Attach Handling
@@ -222,10 +321,8 @@ attachBtn.addEventListener("click", () => {
 fileInput.addEventListener("change", () => {
 
     const file = fileInput.files[0];
-
     if (!file) return;
 
-    // Keep it simple: limit size to ~200KB of text
     if (file.size > 200 * 1024) {
         alert("File is too large. Please choose a file under 200KB.");
         fileInput.value = "";
@@ -262,97 +359,112 @@ function clearAttachedFile() {
 }
 
 // ==============================
-// Message Rendering (visual only, no persistence)
+// Message Rendering
 // ==============================
 
-function renderMessage(message, sender, fileTag) {
+function renderMessage(message, sender, fileTag, time) {
 
+    const timestamp = time || Date.now();
+
+    if (sender === "user") {
+
+        const div = document.createElement("div");
+        div.className = "user";
+
+        const content = document.createElement("div");
+        content.className = "user-content";
+
+        const bubble = document.createElement("div");
+        bubble.className = "message";
+
+        if (fileTag){
+            const tag = document.createElement("div");
+            tag.className = "file-attached-tag";
+            tag.innerHTML = `<i class="fa-solid fa-paperclip"></i> ${escapeHTML(fileTag)}`;
+            bubble.appendChild(tag);
+            bubble.appendChild(document.createElement("br"));
+        }
+
+        const textSpan = document.createElement("span");
+        textSpan.textContent = message;
+        bubble.appendChild(textSpan);
+
+        const meta = document.createElement("div");
+        meta.className = "user-meta";
+        meta.innerHTML = `<span>${formatTime(timestamp)}</span><i class="fa-solid fa-check-double read-receipt"></i>`;
+
+        content.appendChild(bubble);
+        content.appendChild(meta);
+        div.appendChild(content);
+
+        chatArea.appendChild(div);
+        chatArea.scrollTop = chatArea.scrollHeight;
+
+        return div;
+    }
+
+    // Bot message
     const div = document.createElement("div");
-    div.className = sender;
+    div.className = "bot";
+
+    const avatar = document.createElement("div");
+    avatar.className = "avatar";
+    avatar.textContent = "O";
+
+    const content = document.createElement("div");
+    content.className = "bot-content";
 
     const bubble = document.createElement("div");
     bubble.className = "message";
-
-    if (fileTag){
-        const tag = document.createElement("div");
-        tag.className = "file-attached-tag";
-        tag.innerHTML = `<i class="fa-solid fa-paperclip"></i> ${escapeHTML(fileTag)}`;
-        bubble.appendChild(tag);
-        bubble.appendChild(document.createElement("br"));
-    }
 
     const textSpan = document.createElement("span");
     textSpan.textContent = message;
     bubble.appendChild(textSpan);
 
-    div.appendChild(bubble);
+    const timeEl = document.createElement("div");
+    timeEl.className = "msg-time";
+    timeEl.textContent = formatTime(timestamp);
 
-    // Voice + Copy actions (bot messages only)
-    if (sender === "bot"){
+    const actions = document.createElement("div");
+    actions.className = "msg-actions";
 
-        const actions = document.createElement("div");
-        actions.className = "msg-actions";
+    const copyBtn = document.createElement("button");
+    copyBtn.className = "msg-action";
+    copyBtn.innerHTML = `<i class="fa-regular fa-copy"></i> Copy`;
+    copyBtn.addEventListener("click", () => copyMessage(message, copyBtn));
 
-        const speakBtn = document.createElement("i");
-        speakBtn.className = "fa-solid fa-volume-high msg-action-icon";
-        speakBtn.title = "Listen";
-        speakBtn.addEventListener("click", () => speakMessage(message, speakBtn));
+    const divider = document.createElement("span");
+    divider.className = "msg-action-divider";
+    divider.textContent = "|";
 
-        const copyBtn = document.createElement("i");
-        copyBtn.className = "fa-regular fa-copy msg-action-icon";
-        copyBtn.title = "Copy";
-        copyBtn.addEventListener("click", () => copyMessage(message, copyBtn));
+    const downloadBtn = document.createElement("button");
+    downloadBtn.className = "msg-action";
+    downloadBtn.innerHTML = `<i class="fa-solid fa-download"></i> Download`;
+    downloadBtn.addEventListener("click", () => downloadTextFile("orin-reply.txt", message));
 
-        actions.appendChild(speakBtn);
-        actions.appendChild(copyBtn);
-        div.appendChild(actions);
-    }
+    actions.appendChild(copyBtn);
+    actions.appendChild(divider);
+    actions.appendChild(downloadBtn);
+
+    content.appendChild(bubble);
+    content.appendChild(timeEl);
+    content.appendChild(actions);
+
+    div.appendChild(avatar);
+    div.appendChild(content);
 
     chatArea.appendChild(div);
-
     chatArea.scrollTop = chatArea.scrollHeight;
 
     return div;
 }
 
-function speakMessage(text, btn){
-
-    if (!("speechSynthesis" in window)){
-        alert("Voice playback isn't supported in this browser.");
-        return;
-    }
-
-    if (window.speechSynthesis.speaking){
-        window.speechSynthesis.cancel();
-        btn.classList.remove("fa-volume-xmark");
-        btn.classList.add("fa-volume-high");
-        return;
-    }
-
-    const utterance = new SpeechSynthesisUtterance(text);
-
-    utterance.onend = () => {
-        btn.classList.remove("fa-volume-xmark");
-        btn.classList.add("fa-volume-high");
-    };
-
-    btn.classList.remove("fa-volume-high");
-    btn.classList.add("fa-volume-xmark");
-
-    window.speechSynthesis.speak(utterance);
-}
-
 function copyMessage(text, btn){
-
     navigator.clipboard.writeText(text).then(() => {
-        btn.classList.remove("fa-regular");
-        btn.classList.add("fa-solid");
-        btn.title = "Copied!";
-
+        const original = btn.innerHTML;
+        btn.innerHTML = `<i class="fa-solid fa-check"></i> Copied`;
         setTimeout(() => {
-            btn.classList.remove("fa-solid");
-            btn.classList.add("fa-regular");
-            btn.title = "Copy";
+            btn.innerHTML = original;
         }, 1200);
     });
 }
@@ -360,12 +472,13 @@ function copyMessage(text, btn){
 // Renders AND saves the message into the active chat
 function createMessage(message, sender, fileTag) {
 
-    const div = renderMessage(message, sender, fileTag);
+    const time = Date.now();
+    const div = renderMessage(message, sender, fileTag, time);
 
     const chat = getCurrentChat();
 
     if (chat){
-        chat.messages.push({ sender, text: message, fileTag: fileTag || null });
+        chat.messages.push({ sender, text: message, fileTag: fileTag || null, time });
         saveChats();
     }
 
@@ -376,19 +489,18 @@ function createMessage(message, sender, fileTag) {
 function typingAnimation(){
 
     const div = document.createElement("div");
-
     div.className = "bot";
 
     div.innerHTML = `
-    <div class="message typing">
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
+        <div class="avatar">O</div>
+        <div class="message typing">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
     `;
 
     chatArea.appendChild(div);
-
     chatArea.scrollTop = chatArea.scrollHeight;
 
     return div;
@@ -403,7 +515,6 @@ async function sendMessage(){
 
     welcomeEl.style.display = "none";
 
-    // If this is the first message of a fresh chat, create the conversation now
     if (currentChatId === null){
 
         const chat = {
@@ -419,14 +530,11 @@ async function sendMessage(){
         renderHistory();
     }
 
-    // Grab everything said so far in this chat BEFORE we add the new message
     const chatForHistory = getCurrentChat();
     const historyPrompt = buildHistoryPrompt(chatForHistory);
 
-    // What the user sees in the chat bubble (also persisted)
     createMessage(text || "(sent a file)", "user", attachedFile ? attachedFile.name : null);
 
-    // What actually gets sent to the backend
     let messageToSend = text;
 
     if (attachedFile) {
@@ -441,58 +549,4 @@ async function sendMessage(){
     }
 
     textarea.value = "";
-    textarea.style.height = "auto";
-    clearAttachedFile();
-
-    const typing = typingAnimation();
-
-    try{
-
-        const response = await fetch(API_URL,{
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify({
-                message: messageToSend
-            })
-        });
-
-        const data = await response.json();
-
-        typing.remove();
-
-        createMessage(data.reply, "bot");
-
-    }
-    catch(error){
-
-        typing.remove();
-
-        createMessage(
-            "⚠ Unable to connect to FastAPI server.",
-            "bot"
-        );
-
-        console.error(error);
-
-    }
-
 }
-// ==============================
-// Mobile Sidebar Toggle
-// ==============================
-
-const menuToggle = document.getElementById("menuToggle");
-const sidebar = document.querySelector(".sidebar");
-const sidebarOverlay = document.getElementById("sidebarOverlay");
-
-menuToggle.addEventListener("click", () => {
-    sidebar.classList.toggle("open");
-    sidebarOverlay.classList.toggle("show");
-});
-
-sidebarOverlay.addEventListener("click", () => {
-    sidebar.classList.remove("open");
-    sidebarOverlay.classList.remove("show");
-});
