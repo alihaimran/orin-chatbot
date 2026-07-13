@@ -895,3 +895,9 @@ body.light-theme .top-menu-dropdown button{
     }
 
 }
+.logo-icon-svg{
+    width:44px;
+    height:44px;
+    min-width:44px;
+    filter:drop-shadow(0 0 10px rgba(34,197,94,.25));
+}
